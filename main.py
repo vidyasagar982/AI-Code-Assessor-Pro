@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import HTML_Response
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
