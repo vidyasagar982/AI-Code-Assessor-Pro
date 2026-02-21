@@ -103,8 +103,27 @@ html_content = """
         }
 
         @media (max-width: 768px) {
-            .workspace { flex-direction: column; overflow-y: auto; }
-            body { height: auto; min-height: 100vh; }
+            body { 
+                height: auto; 
+                min-height: 100dvh; 
+            }
+            .navbar { 
+                padding: 0.75rem 1rem; /* Reclaim space at the top */
+            }
+            .navbar h1 { 
+                font-size: 1.25rem; /* Prevent title from wrapping awkwardly */
+            }
+            .workspace { 
+                flex-direction: column; 
+                padding: 0.5rem; /* Maximize screen real estate for code */
+                gap: 0.75rem;
+            }
+            .panel { 
+                min-height: 400px; /* Prevent panels from crushing to 0 height */
+            }
+            .btn {
+                min-height: 48px; /* Standard accessible height for mobile touch targets */
+            }
         }
 
         /* Panels */
@@ -128,7 +147,7 @@ html_content = """
             align-items: center;
         }
 
-        .controls { display: flex; gap: 0.5rem; width: 100%; }
+        .controls { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
 
         select {
             background: #1f2937;
@@ -330,6 +349,7 @@ html_content = """
                                     <select value={persona} onChange={(e) => setPersona(e.target.value)}>
                                         <option value="senior">Senior Engineer</option>
                                         <option value="tutor">Coding Tutor</option>
+                                        flex: 1 1 45%; min-width: 120px;
                                     </select>
                                 </div>
                             </div>
