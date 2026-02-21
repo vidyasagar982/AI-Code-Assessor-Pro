@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-google-genai
+google-generativeai
 fpdf2
 pydantic
-python-multipart

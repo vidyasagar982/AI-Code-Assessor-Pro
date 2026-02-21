@@ -3,6 +3,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["libxcrypt", "lsof"]
 
 [unitTest]
 language = "python3"
@@ -20,3 +21,7 @@ expertMode = true
 [[ports]]
 localPort = 8080
 externalPort = 80
+
+[[ports]]
+localPort = 10000
+externalPort = 3000
