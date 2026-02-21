@@ -31,6 +31,34 @@ async def assess_code(submission: CodeSubmission):
         return {"feedback": f"**AI Error:** {str(e)}"}
 
 
+@app.post("/api/download")
+async def download_pdf(data: dict):
+    feedback = data.get("feedback", "No feedback available.")
+    language = data.get("language", "Code")
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    # Title
+    pdf.set_font("Helvetica", 'B', 16)
+    pdf.cell(0, 10, f"AI Code Review Report - {language}", ln=True, align='C')
+    pdf.ln(10)
+
+    # Body Content
+    pdf.set_font("Helvetica", size=12)
+    # multi_cell handles long text and automatic line breaks
+    pdf.multi_cell(0, 10, feedback)
+
+    # Output as binary data (this is better for Render/Cloud)
+    pdf_bytes = pdf.output(dest='S') 
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=CodeReview.pdf"}
+    )
+
+
 # 2. Robust Frontend
 html_content = """
 <!DOCTYPE html>
@@ -143,3 +171,13 @@ if __name__ == "__main__":
     # Render provides a PORT environment variable; we default to 10000
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # This allows your frontend to talk to the backend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
