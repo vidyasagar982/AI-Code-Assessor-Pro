@@ -1,15 +1,13 @@
-# Use Python 3.10
 FROM python:3.10-slim
 
-# Set the directory in the container
 WORKDIR /app
 
-# Copy the requirements and install them
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your code
+# Copy everything else
 COPY . .
 
-# Start the FastAPI server using Uvicorn
+# Force the app to bind to 0.0.0.0 (Public) and Port 10000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
