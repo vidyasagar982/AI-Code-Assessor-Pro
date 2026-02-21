@@ -243,29 +243,36 @@ async def analyze_code(req: CodeRequest):
 
 @app.post("/api/download")
 async def download_pdf(req: PDFRequest):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    try:
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
 
-    # Title
-    pdf.set_font("Helvetica", 'B', 16)
-    pdf.cell(0, 10, f"Code Review Report - {req.language}", ln=True, align='C')
-    pdf.ln(5)
+        # Title
+        pdf.set_font("Helvetica", 'B', 16)
+        pdf.cell(0, 10, f"Code Review Report - {req.language}", ln=True, align='C')
+        pdf.ln(5)
 
-    # Body
-    pdf.set_font("Helvetica", size=11)
+        # Body
+        pdf.set_font("Helvetica", size=11)
 
-    # Simple clean up of markdown asterisks for the PDF text
-    clean_text = req.feedback.replace('**', '').replace('```', '')
+        # 1. Clean up markdown formatting
+        clean_text = req.feedback.replace('**', '').replace('```', '')
 
-    pdf.multi_cell(0, 7, clean_text)
+        # 2. THE FIX: Force the text into safe characters so FPDF doesn't crash
+        safe_text = clean_text.encode('latin-1', 'ignore').decode('latin-1')
 
-    pdf_bytes = pdf.output(dest='S')
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=Code_Review_{req.language}.pdf"}
-    )
+        pdf.multi_cell(0, 7, safe_text)
+
+        pdf_bytes = pdf.output(dest='S')
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Code_Review_{req.language}.pdf"}
+        )
+    except Exception as e:
+        print(f"PDF Generation Error: {str(e)}")
+        return Response(status_code=500, content="Failed to generate PDF")
 
 if __name__ == "__main__":
     import uvicorn
