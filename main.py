@@ -264,7 +264,7 @@ async def download_pdf(req: PDFRequest):
 
         pdf.multi_cell(0, 7, safe_text)
 
-        pdf_bytes = pdf.output(dest='S')
+        pdf_bytes = bytes(pdf.output())
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
