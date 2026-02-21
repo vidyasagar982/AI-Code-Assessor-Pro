@@ -64,13 +64,12 @@ html_content = """
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
-            height: 100vh; 
+            height: 100dvh; 
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
         }
 
-        /* Navbar */
         .navbar {
             padding: 1rem 1.5rem;
             background: var(--surface);
@@ -93,7 +92,6 @@ html_content = """
 
         .navbar p { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; }
 
-        /* Main Workspace Grid */
         .workspace {
             flex: 1;
             display: flex;
@@ -102,41 +100,6 @@ html_content = """
             overflow: hidden;
         }
 
-        @media (max-width: 768px) {
-            body { 
-                height: auto; 
-                min-height: 100dvh; 
-                overflow-y: auto; /* 🚨 THE FIX: Lets the whole screen scroll on mobile */
-            }
-            /* ... keep your other mobile CSS here ... */
-        }
-            .navbar { 
-                padding: 0.75rem 1rem; /* Reclaim space at the top */
-            }
-            .navbar h1 { 
-                font-size: 1.25rem; /* Prevent title from wrapping awkwardly */
-            }
-            .workspace { 
-                flex-direction: column; 
-                padding: 0.5rem; /* Maximize screen real estate for code */
-                gap: 0.75rem;
-            }
-            .panel {
-                flex: 1;
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                display: flex;
-                flex-direction: column;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                min-height: 0; /* 🚨 THE FIX: Forces the box to respect screen limits */
-            }
-            .btn {
-                min-height: 48px; /* Standard accessible height for mobile touch targets */
-            }
-        }
-
-        /* Panels */
         .panel {
             flex: 1;
             background: var(--surface);
@@ -146,6 +109,7 @@ html_content = """
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            min-height: 0; /* Ensures the flexbox can scroll */
         }
 
         .panel-header {
@@ -160,6 +124,8 @@ html_content = """
         .controls { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
 
         select {
+            flex: 1 1 45%; 
+            min-width: 120px;
             background: #1f2937;
             color: white;
             border: 1px solid #374151;
@@ -174,7 +140,6 @@ html_content = """
 
         select:hover, select:focus { border-color: var(--primary); }
 
-        /* Editor Area */
         textarea {
             flex: 1;
             width: 100%;
@@ -187,9 +152,9 @@ html_content = """
             line-height: 1.5;
             resize: none;
             outline: none;
+            overflow-y: auto;
         }
 
-        /* Buttons */
         .btn {
             padding: 0.85rem;
             border: none;
@@ -230,15 +195,13 @@ html_content = """
 
         .btn-success:hover { background: rgba(16, 185, 129, 0.2); transform: translateY(-1px); }
 
-        /* Output Area */
         .output-area {
             flex: 1;
-            overflow-y: auto; /* 🚨 THE FIX: Turns on the vertical slider */
+            overflow-y: auto; /* Activates the vertical scrollbar */
             padding: 1.5rem;
             height: 100%;
         }
 
-        /* Animations */
         .spinner {
             border: 3px solid rgba(255,255,255,0.1);
             border-top: 3px solid #fff;
@@ -263,7 +226,6 @@ html_content = """
 
         .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; }
 
-        /* Beautiful Markdown Formatting */
         .markdown-body h2 { color: #fff; font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
         .markdown-body h3 { color: #e2e8f0; font-size: 1.25rem; margin-top: 1rem; margin-bottom: 0.5rem; }
         .markdown-body p, .markdown-body li { color: #cbd5e1; line-height: 1.7; margin-bottom: 1rem; }
@@ -272,11 +234,30 @@ html_content = """
         .markdown-body code { font-family: 'Fira Code', monospace; font-size: 0.85rem; }
         .markdown-body p > code, .markdown-body li > code { background: rgba(59, 130, 246, 0.1); color: #93c5fd; padding: 0.2rem 0.4rem; border-radius: 4px; }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            body { 
+                height: auto; 
+                min-height: 100dvh; 
+                overflow-y: auto; /* Allows mobile scrolling */
+            }
+            .navbar { padding: 0.75rem 1rem; }
+            .navbar h1 { font-size: 1.25rem; }
+            .workspace { 
+                flex-direction: column; 
+                padding: 0.5rem; 
+                gap: 0.75rem;
+                overflow: visible;
+            }
+            .panel { min-height: 400px; overflow: visible; }
+            .output-area { overflow-y: visible; height: auto; }
+            .btn { min-height: 48px; }
+        }
     </style>
 </head>
 <body>
@@ -348,7 +329,6 @@ html_content = """
                     </div>
 
                     <div className="workspace">
-                        {/* Editor Panel */}
                         <div className="panel">
                             <div className="panel-header">
                                 <div className="controls">
@@ -360,7 +340,6 @@ html_content = """
                                     <select value={persona} onChange={(e) => setPersona(e.target.value)}>
                                         <option value="senior">Senior Engineer</option>
                                         <option value="tutor">Coding Tutor</option>
-                                        flex: 1 1 45%; min-width: 120px;
                                     </select>
                                 </div>
                             </div>
@@ -390,7 +369,6 @@ html_content = """
                             </button>
                         </div>
 
-                        {/* Results Panel */}
                         <div className="panel">
                             <div className="panel-header" style={{ justifyContent: 'space-between' }}>
                                 <h3 style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
