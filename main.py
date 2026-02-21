@@ -106,7 +106,10 @@ html_content = """
             body { 
                 height: auto; 
                 min-height: 100dvh; 
+                overflow-y: auto; /* 🚨 THE FIX: Lets the whole screen scroll on mobile */
             }
+            /* ... keep your other mobile CSS here ... */
+        }
             .navbar { 
                 padding: 0.75rem 1rem; /* Reclaim space at the top */
             }
@@ -118,8 +121,15 @@ html_content = """
                 padding: 0.5rem; /* Maximize screen real estate for code */
                 gap: 0.75rem;
             }
-            .panel { 
-                min-height: 400px; /* Prevent panels from crushing to 0 height */
+            .panel {
+                flex: 1;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                min-height: 0; /* 🚨 THE FIX: Forces the box to respect screen limits */
             }
             .btn {
                 min-height: 48px; /* Standard accessible height for mobile touch targets */
@@ -223,8 +233,9 @@ html_content = """
         /* Output Area */
         .output-area {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* 🚨 THE FIX: Turns on the vertical slider */
             padding: 1.5rem;
+            height: 100%;
         }
 
         /* Animations */
