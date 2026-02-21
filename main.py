@@ -60,14 +60,14 @@ html_content = """
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* 1. We let the body scroll normally if needed */
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg); 
             color: var(--text); 
-            height: 100dvh; 
+            min-height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; 
         }
 
         .navbar {
@@ -78,7 +78,6 @@ html_content = """
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 10;
         }
 
         .navbar h1 {
@@ -93,23 +92,27 @@ html_content = """
         .navbar p { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; }
 
         .workspace {
-            flex: 1;
             display: flex;
             gap: 1rem;
             padding: 1rem;
-            overflow: hidden;
+            flex-wrap: wrap; /* Allows stacking on small screens */
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
+        /* 2. THE FIX: Explicit height forces the scrollbars to appear! */
         .panel {
-            flex: 1;
+            flex: 1 1 45%; /* Take up half the screen, but wrap if too small */
+            min-width: 300px;
+            height: 75vh; /* STRICT HEIGHT */
+            min-height: 500px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            min-height: 0; /* Ensures the flexbox can scroll */
         }
 
         .panel-header {
@@ -119,13 +122,14 @@ html_content = """
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0; /* Prevents header from shrinking */
         }
 
         .controls { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
 
         select {
-            flex: 1 1 45%; 
-            min-width: 120px;
+            flex: 1; 
+            min-width: 100px;
             background: #1f2937;
             color: white;
             border: 1px solid #374151;
@@ -152,7 +156,7 @@ html_content = """
             line-height: 1.5;
             resize: none;
             outline: none;
-            overflow-y: auto;
+            overflow-y: auto; /* Scrollbar for code input */
         }
 
         .btn {
@@ -167,21 +171,16 @@ html_content = """
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
             margin: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.4);
-        }
-
+        .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
         .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .btn-success {
@@ -192,45 +191,26 @@ html_content = """
             font-size: 0.75rem;
             border-radius: 6px;
         }
+        .btn-success:hover { background: rgba(16, 185, 129, 0.2); }
 
-        .btn-success:hover { background: rgba(16, 185, 129, 0.2); transform: translateY(-1px); }
-
+        /* 3. Output area is now guaranteed to scroll within the strict 75vh panel */
         .output-area {
             flex: 1;
-            overflow-y: auto; /* Activates the vertical scrollbar */
+            overflow-y: auto; 
             padding: 1.5rem;
-            height: 100%;
         }
 
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #fff;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-muted);
-            text-align: center;
-            opacity: 0.6;
-        }
-
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; opacity: 0.6; }
         .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; }
 
         .markdown-body h2 { color: #fff; font-size: 1.5rem; margin-top: 1rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
         .markdown-body h3 { color: #e2e8f0; font-size: 1.25rem; margin-top: 1rem; margin-bottom: 0.5rem; }
         .markdown-body p, .markdown-body li { color: #cbd5e1; line-height: 1.7; margin-bottom: 1rem; }
         .markdown-body ul { padding-left: 1.5rem; margin-bottom: 1rem; }
-        .markdown-body pre { background: #0b0f19 !important; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; margin: 1rem 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .markdown-body pre { background: #0b0f19 !important; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; margin: 1rem 0; }
         .markdown-body code { font-family: 'Fira Code', monospace; font-size: 0.85rem; }
         .markdown-body p > code, .markdown-body li > code { background: rgba(59, 130, 246, 0.1); color: #93c5fd; padding: 0.2rem 0.4rem; border-radius: 4px; }
 
@@ -239,24 +219,14 @@ html_content = """
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
-        /* Mobile Adjustments */
+        /* Mobile specific heights */
         @media (max-width: 768px) {
-            body { 
-                height: auto; 
-                min-height: 100dvh; 
-                overflow-y: auto; /* Allows mobile scrolling */
+            .workspace { padding: 0.5rem; flex-direction: column; }
+            .panel { 
+                width: 100%; 
+                flex: none; 
+                height: 60vh; /* Shorter panels on mobile so you can see both */
             }
-            .navbar { padding: 0.75rem 1rem; }
-            .navbar h1 { font-size: 1.25rem; }
-            .workspace { 
-                flex-direction: column; 
-                padding: 0.5rem; 
-                gap: 0.75rem;
-                overflow: visible;
-            }
-            .panel { min-height: 400px; overflow: visible; }
-            .output-area { overflow-y: visible; height: auto; }
-            .btn { min-height: 48px; }
         }
     </style>
 </head>
@@ -325,7 +295,7 @@ html_content = """
                 <React.Fragment>
                     <div className="navbar">
                         <h1>AI Code Lab Pro</h1>
-                        <p>v2.0 Beta</p>
+                        <p>v2.0</p>
                     </div>
 
                     <div className="workspace">
@@ -345,27 +315,14 @@ html_content = """
                             </div>
 
                             <textarea 
-                                placeholder="// Write or paste your code here...&#10;// The AI will analyze logic, efficiency, and time complexity."
+                                placeholder="// Write or paste your code here..."
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
                                 spellCheck="false"
                             />
 
-                            <button 
-                                className="btn btn-primary" 
-                                onClick={analyzeCode} 
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <React.Fragment>
-                                        <div className="spinner"></div>
-                                        Analyzing Logic...
-                                    </React.Fragment>
-                                ) : (
-                                    <React.Fragment>
-                                        🚀 Run AI Analysis
-                                    </React.Fragment>
-                                )}
+                            <button className="btn btn-primary" onClick={analyzeCode} disabled={loading}>
+                                {loading ? ( <React.Fragment><div className="spinner"></div>Analyzing...</React.Fragment> ) : ( "🚀 Run AI Analysis" )}
                             </button>
                         </div>
 
@@ -375,9 +332,7 @@ html_content = """
                                     ✨ Analysis Report
                                 </h3>
                                 {result && (
-                                    <button className="btn btn-success" onClick={downloadPDF}>
-                                        📥 Export PDF
-                                    </button>
+                                    <button className="btn btn-success" onClick={downloadPDF}>📥 Export PDF</button>
                                 )}
                             </div>
 
